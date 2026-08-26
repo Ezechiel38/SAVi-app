@@ -72,6 +72,9 @@ const styles = {
   dropPanel: { marginTop: 8, borderRadius: 14, border: "1px solid #1e293b", background: "rgba(2,6,23,.95)", overflow: "hidden" },
   dropItem: { width: "100%", padding: "15px 18px", background: "none", border: "none", borderTop: "1px solid #1e293b", color: "#f1f5f9", fontSize: 14, fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 },
   soon: { fontSize: 9, textTransform: "uppercase", letterSpacing: 1.2, padding: "3px 8px", borderRadius: 999, border: "1px solid #334155", color: "#475569", whiteSpace: "nowrap" },
+  glow: { position: "absolute", top: "-15%", left: "50%", transform: "translateX(-50%)", width: 520, height: 520, borderRadius: "50%", background: "radial-gradient(circle, rgba(245,158,11,.09) 0%, transparent 65%)", pointerEvents: "none" },
+  watermark: { position: "absolute", top: "50%", left: "50%", width: 620, height: 620, marginTop: -330, marginLeft: -310, opacity: 0.05, pointerEvents: "none", animation: "savi-spin-rev 120s linear infinite" },
+  pill: { display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 999, border: "1px solid #1e293b", background: "rgba(15,23,42,.5)", fontSize: 11, color: "#64748b", whiteSpace: "nowrap" },
 };
 
 const SPECIALITES = [
@@ -113,10 +116,17 @@ function LogoSAVi({ taille = 72 }) {
   }
   return (
     <svg viewBox="0 0 48 48" width={taille} height={taille} fill="none">
-      <path d="M16 5v5M24 5v5M32 5v5M16 38v5M24 38v5M32 38v5M5 16h5M5 24h5M5 32h5M38 16h5M38 24h5M38 32h5" stroke="#334155" strokeWidth="2" strokeLinecap="round" />
-      <rect x="10" y="10" width="28" height="28" rx="6" stroke="#475569" strokeWidth="2.2" />
-      <path d="M15 24s3.8-5.5 9-5.5S33 24 33 24s-3.8 5.5-9 5.5S15 24 15 24Z" stroke="#94a3b8" strokeWidth="1.8" />
-      <circle cx="24" cy="24" r="2.8" fill="#fbbf24" />
+      {/* denture du pignon, en rotation lente */}
+      <g style={{ transformOrigin: "24px 24px", animation: "savi-spin 26s linear infinite" }}>
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+          <rect key={a} x="22.4" y="2.5" width="3.2" height="7" rx="1.2" fill="#334155" transform={"rotate(" + a + " 24 24)"} />
+        ))}
+        <circle cx="24" cy="24" r="17" stroke="#475569" strokeWidth="2.2" />
+      </g>
+      {/* empreinte six pans */}
+      <path d="M32 24L28 30.93L20 30.93L16 24L20 17.07L28 17.07Z" stroke="#94a3b8" strokeWidth="2" strokeLinejoin="round" />
+      {/* repère de mesure */}
+      <circle cx="24" cy="24" r="2.6" fill="#fbbf24" />
     </svg>
   );
 }
@@ -124,16 +134,53 @@ function LogoSAVi({ taille = 72 }) {
 function Accueil({ go }) {
   const [ouvert, setOuvert] = useState(false);
 
+  const tick = (pos) => ({
+    position: "absolute",
+    width: 14,
+    height: 14,
+    borderColor: "#1e293b",
+    borderStyle: "solid",
+    borderWidth: 0,
+    ...pos,
+  });
+
   return (
     <div style={styles.landing}>
+      <style>{`
+        @keyframes savi-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes savi-spin-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes savi-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="savi-spin"], [style*="savi-in"] { animation: none !important; }
+        }
+      `}</style>
+
       <div style={styles.landingGrid} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 380, textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
-          <LogoSAVi taille={72} />
+      <div style={styles.glow} />
+
+      <svg viewBox="0 0 48 48" style={styles.watermark} fill="none" aria-hidden="true">
+        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((a) => (
+          <rect key={a} x="22.6" y="1.5" width="2.8" height="7" rx="1" fill="#94a3b8" transform={"rotate(" + a + " 24 24)"} />
+        ))}
+        <circle cx="24" cy="24" r="18" stroke="#94a3b8" strokeWidth="1.4" />
+        <circle cx="24" cy="24" r="7" stroke="#94a3b8" strokeWidth="1.4" />
+      </svg>
+
+      <div style={{ position: "relative", width: "100%", maxWidth: 360, textAlign: "center", animation: "savi-in .5s ease-out" }}>
+        <div style={tick({ top: -14, left: -14, borderLeftWidth: 1, borderTopWidth: 1 })} />
+        <div style={tick({ top: -14, right: -14, borderRightWidth: 1, borderTopWidth: 1 })} />
+        <div style={tick({ bottom: -14, left: -14, borderLeftWidth: 1, borderBottomWidth: 1 })} />
+        <div style={tick({ bottom: -14, right: -14, borderRightWidth: 1, borderBottomWidth: 1 })} />
+
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+          <LogoSAVi taille={78} />
         </div>
-        <h1 style={{ fontSize: 64, fontWeight: 900, letterSpacing: -3, lineHeight: 1, margin: "0 0 44px" }}>
+        <h1 style={{ fontSize: 62, fontWeight: 900, letterSpacing: -3, lineHeight: 1, margin: "0 0 10px" }}>
           SAV<span style={{ color: "#fbbf24" }}>i</span>
         </h1>
+        <p style={{ color: "#64748b", fontSize: 13.5, lineHeight: 1.6, margin: "0 auto 34px", maxWidth: 300 }}>
+          L'assistant de maintenance qui diagnostique, documente et chiffre — depuis le terrain.
+        </p>
 
         <div style={{ ...styles.label, textAlign: "left", marginBottom: 8 }}>Spécialité</div>
         <button onClick={() => setOuvert(!ouvert)} style={styles.dropBtn}>
@@ -159,15 +206,21 @@ function Accueil({ go }) {
                   <span style={{ display: "block", fontWeight: 600, color: sp.actif ? "#f1f5f9" : "#64748b" }}>{sp.label}</span>
                   <span style={{ display: "block", fontSize: 11, color: "#475569", marginTop: 2 }}>{sp.detail}</span>
                 </span>
-                {sp.actif
-                  ? <span style={{ color: "#fbbf24", fontSize: 15 }}>→</span>
-                  : <span style={styles.soon}>Bientôt</span>}
+                {sp.actif ? <span style={{ color: "#fbbf24", fontSize: 15 }}>→</span> : <span style={styles.soon}>Bientôt</span>}
               </button>
             ))}
           </div>
         )}
 
-        <div style={{ marginTop: 48, fontSize: 10, color: "#1e293b", letterSpacing: 2, textTransform: "uppercase" }}>
+        {!ouvert && (
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginTop: 28 }}>
+            <span style={styles.pill}>✨ Diagnostic IA</span>
+            <span style={styles.pill}>📘 6 marques</span>
+            <span style={styles.pill}>📋 7 équipements</span>
+          </div>
+        )}
+
+        <div style={{ marginTop: 40, fontSize: 10, color: "#1e293b", letterSpacing: 2, textTransform: "uppercase" }}>
           v1.2 · Assistant technicien
         </div>
       </div>
