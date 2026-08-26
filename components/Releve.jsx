@@ -20,10 +20,10 @@ const T = {
   doux: "#94a3b8",
   faible: "#64748b",
   tresFaible: "#475569",
-  accent: "#10b981",
-  accentClair: "#34d399",
-  accentFond: "rgba(16,185,129,.1)",
-  accentBord: "rgba(16,185,129,.3)",
+  accent: "#06b6d4",
+  accentClair: "#67e8f9",
+  accentFond: "rgba(6,182,212,.1)",
+  accentBord: "rgba(6,182,212,.3)",
   ambre: "#f59e0b",
   ambreClair: "#fcd34d",
   ambreFond: "rgba(245,158,11,.1)",
@@ -1473,7 +1473,7 @@ export default function Releve({ onBack }) {
                         <span style={{ fontWeight: 700 }}>{li.comp.label}</span>
                         <span style={{ fontSize: 11, color: P.doux }}>×{li.quantite}</span>
                         {li.aChiffrer && (
-                          <span style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: 1, border: "1px solid " + T.accent, color: "#047857", borderRadius: 3, padding: "1px 5px" }}>à chiffrer</span>
+                          <span style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: 1, border: "1px solid " + T.accent, color: "#0e7490", borderRadius: 3, padding: "1px 5px" }}>à chiffrer</span>
                         )}
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 32 }}>
