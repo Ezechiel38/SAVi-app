@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Head from "next/head";
 import Releve from "../components/Releve";
+import Dashboard from "../components/Dashboard";
 
 const BRANDS = [
   { name: "Came", color: "#E30613", specialty: "Portails, portes de garage, bornes", website: "https://www.came.com/fr/fr",
@@ -221,7 +222,7 @@ function Accueil({ go }) {
         )}
 
         <div style={{ marginTop: 40, fontSize: 10, color: "#1e293b", letterSpacing: 2, textTransform: "uppercase" }}>
-          v1.2 · Assistant technicien
+          v1.3 · Assistant technicien
         </div>
       </div>
     </div>
@@ -269,6 +270,15 @@ function Home({ go, onBack }) {
               <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Relevé pour devis</h2>
               <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Prise de référence sur site, transmise au commercial pour chiffrage.</p>
               <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#34d399" }}>Démarrer un relevé →</div>
+            </div>
+          </button>
+          <button onClick={() => go("dashboard")} style={styles.card}>
+            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(139,92,246,.1)", filter: "blur(30px)" }} />
+            <div style={{ position: "relative" }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(139,92,246,.1)", border: "1px solid rgba(139,92,246,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📊</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Tableau de bord</h2>
+              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Délais de chiffrage, fiches en attente, activité des équipes.</p>
+              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#a78bfa" }}>Voir l'activité →</div>
             </div>
           </button>
         </div>
@@ -444,6 +454,7 @@ export default function App() {
       {s === "ia" ? <IA onBack={() => setS("home")} />
         : s === "doc" ? <Doc onBack={() => setS("home")} />
         : s === "releve" ? <Releve onBack={() => setS("home")} />
+        : s === "dashboard" ? <Dashboard onBack={() => setS("home")} />
         : s === "home" ? <Home go={setS} onBack={() => setS("accueil")} />
         : <Accueil go={setS} />}
     </div>
