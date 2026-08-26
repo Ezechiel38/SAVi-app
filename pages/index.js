@@ -2,6 +2,7 @@ import { useState } from "react";
 import Head from "next/head";
 import Releve from "../components/Releve";
 import Dashboard from "../components/Dashboard";
+import Documents from "../components/Documents";
 
 const BRANDS = [
   { name: "Came", color: "#E30613", specialty: "Portails, portes de garage, bornes", website: "https://www.came.com/fr/fr",
@@ -87,8 +88,8 @@ const SPECIALITES = [
 ];
 
 function Header({ onBack, icon, accent, title, subtitle }) {
-  const border = accent === "amber" ? "rgba(245,158,11,.3)" : accent === "emerald" ? "rgba(16,185,129,.3)" : "rgba(6,182,212,.3)";
-  const bg = accent === "amber" ? "rgba(245,158,11,.1)" : accent === "emerald" ? "rgba(16,185,129,.1)" : "rgba(6,182,212,.1)";
+  const border = accent === "amber" ? "rgba(245,158,11,.3)" : accent === "emerald" ? "rgba(6,182,212,.3)" : "rgba(6,182,212,.3)";
+  const bg = accent === "amber" ? "rgba(245,158,11,.1)" : accent === "emerald" ? "rgba(6,182,212,.1)" : "rgba(6,182,212,.1)";
   return (
     <div style={styles.header}>
       <div style={styles.headerInner}>
@@ -264,21 +265,21 @@ function Home({ go, onBack }) {
             </div>
           </button>
           <button onClick={() => go("releve")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(16,185,129,.1)", filter: "blur(30px)" }} />
+            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(6,182,212,.1)", filter: "blur(30px)" }} />
             <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(16,185,129,.1)", border: "1px solid rgba(16,185,129,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📋</div>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(6,182,212,.1)", border: "1px solid rgba(6,182,212,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📋</div>
               <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Relevé pour devis</h2>
               <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Prise de référence sur site, transmise au commercial pour chiffrage.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#34d399" }}>Démarrer un relevé →</div>
+              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#22d3ee" }}>Démarrer un relevé →</div>
             </div>
           </button>
           <button onClick={() => go("dashboard")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(139,92,246,.1)", filter: "blur(30px)" }} />
+            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(245,158,11,.1)", filter: "blur(30px)" }} />
             <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(139,92,246,.1)", border: "1px solid rgba(139,92,246,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📊</div>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📊</div>
               <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Tableau de bord</h2>
               <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Délais de chiffrage, fiches en attente, activité des équipes.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#a78bfa" }}>Voir l'activité →</div>
+              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#fbbf24" }}>Voir l'activité →</div>
             </div>
           </button>
         </div>
@@ -396,6 +397,7 @@ function IA({ onBack }) {
 function Doc({ onBack }) {
   const [sel, setSel] = useState(null);
   const [q, setQ] = useState("");
+  const [onglet, setOnglet] = useState("constructeurs");
   const brand = sel ? BRANDS.find(b => b.name === sel) : null;
   const all = brand ? brand.docs.map(d => ({ ...d, brand: brand.name })) : BRANDS.flatMap(b => b.docs.map(d => ({ ...d, brand: b.name })));
   const filtered = all.filter(d => d.title.toLowerCase().includes(q.toLowerCase()) || d.type.toLowerCase().includes(q.toLowerCase()));
@@ -403,8 +405,21 @@ function Doc({ onBack }) {
 
   return (
     <div>
-      <Header onBack={onBack} icon="📘" accent="cyan" title="Documentation technique" subtitle={brand ? brand.name : "6 marques"} />
+      <Header onBack={onBack} icon="📘" accent="cyan" title="Documentation technique" subtitle={onglet === "perso" ? "Mes documents" : brand ? brand.name : "6 marques"} />
       <div style={styles.content}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+          {[
+            { id: "constructeurs", l: "Constructeurs" },
+            { id: "perso", l: "Mes documents" },
+          ].map((o) => (
+            <button key={o.id} onClick={() => setOnglet(o.id)} style={bc(onglet === o.id)}>{o.l}</button>
+          ))}
+        </div>
+
+        {onglet === "perso" && <Documents />}
+
+        {onglet === "constructeurs" && (
+        <>
         <div style={{ position: "relative", marginBottom: 20 }}>
           <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14 }}>🔍</span>
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher..." style={{ ...styles.input, paddingLeft: 40, padding: "13px 14px 13px 40px", borderRadius: 12, background: "rgba(15,23,42,.5)", border: "1px solid #1e293b" }} />
@@ -437,6 +452,8 @@ function Doc({ onBack }) {
             <span style={{ color: "#334155", fontSize: 14 }}>↗</span>
           </div>
         ))}
+        </>
+        )}
       </div>
     </div>
   );
