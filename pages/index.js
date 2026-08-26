@@ -65,7 +65,22 @@ const styles = {
   label: { fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, color: "#64748b", fontWeight: 600, marginBottom: 8 },
   input: { width: "100%", padding: "11px 14px", borderRadius: 10, background: "rgba(30,41,59,.5)", border: "1px solid #334155", color: "#f1f5f9", fontSize: 13, outline: "none", fontFamily: "inherit" },
   btnPrimary: { width: "100%", padding: 14, borderRadius: 10, border: "none", cursor: "pointer", background: "#f59e0b", color: "#020617", fontWeight: 700, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 },
+  // ACCUEIL
+  landing: { minHeight: "100vh", background: "radial-gradient(circle at 50% -10%, #0a1220 0%, #010206 55%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px", position: "relative", overflow: "hidden" },
+  landingGrid: { position: "absolute", inset: 0, opacity: 0.03, backgroundImage: "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)", backgroundSize: "44px 44px", pointerEvents: "none" },
+  dropBtn: { width: "100%", padding: "16px 18px", borderRadius: 14, border: "1px solid #1e293b", background: "rgba(15,23,42,.6)", color: "#f1f5f9", fontSize: 14, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, textAlign: "left" },
+  dropPanel: { marginTop: 8, borderRadius: 14, border: "1px solid #1e293b", background: "rgba(2,6,23,.95)", overflow: "hidden" },
+  dropItem: { width: "100%", padding: "15px 18px", background: "none", border: "none", borderTop: "1px solid #1e293b", color: "#f1f5f9", fontSize: 14, fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  soon: { fontSize: 9, textTransform: "uppercase", letterSpacing: 1.2, padding: "3px 8px", borderRadius: 999, border: "1px solid #334155", color: "#475569", whiteSpace: "nowrap" },
 };
+
+const SPECIALITES = [
+  { id: "fermeture", label: "Fermeture & automatisme", detail: "Portails, sectionnelles, rideaux, quais", actif: true },
+  { id: "electricite", label: "Électricité", detail: "Courants forts et faibles", actif: false },
+  { id: "levage", label: "Levage & manutention", detail: "Monte-charges, tables élévatrices", actif: false },
+  { id: "cvc", label: "CVC & climatisation", detail: "Chauffage, ventilation, froid", actif: false },
+  { id: "incendie", label: "Sécurité incendie", detail: "Désenfumage, portes coupe-feu", actif: false },
+];
 
 function Header({ onBack, icon, accent, title, subtitle }) {
   const border = accent === "amber" ? "rgba(245,158,11,.3)" : accent === "emerald" ? "rgba(16,185,129,.3)" : "rgba(6,182,212,.3)";
@@ -84,14 +99,95 @@ function Header({ onBack, icon, accent, title, subtitle }) {
   );
 }
 
-function Home({ go }) {
+function LogoSAVi({ taille = 72 }) {
+  const [erreur, setErreur] = useState(false);
+  if (!erreur) {
+    return (
+      <img
+        src="/img/savi-logo.svg"
+        alt="SAVi"
+        onError={() => setErreur(true)}
+        style={{ width: taille, height: taille, objectFit: "contain" }}
+      />
+    );
+  }
+  return (
+    <svg viewBox="0 0 48 48" width={taille} height={taille} fill="none">
+      <path d="M16 5v5M24 5v5M32 5v5M16 38v5M24 38v5M32 38v5M5 16h5M5 24h5M5 32h5M38 16h5M38 24h5M38 32h5" stroke="#334155" strokeWidth="2" strokeLinecap="round" />
+      <rect x="10" y="10" width="28" height="28" rx="6" stroke="#475569" strokeWidth="2.2" />
+      <path d="M15 24s3.8-5.5 9-5.5S33 24 33 24s-3.8 5.5-9 5.5S15 24 15 24Z" stroke="#94a3b8" strokeWidth="1.8" />
+      <circle cx="24" cy="24" r="2.8" fill="#fbbf24" />
+    </svg>
+  );
+}
+
+function Accueil({ go }) {
+  const [ouvert, setOuvert] = useState(false);
+
+  return (
+    <div style={styles.landing}>
+      <div style={styles.landingGrid} />
+      <div style={{ position: "relative", width: "100%", maxWidth: 380, textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+          <LogoSAVi taille={72} />
+        </div>
+        <h1 style={{ fontSize: 64, fontWeight: 900, letterSpacing: -3, lineHeight: 1, margin: "0 0 44px" }}>
+          SAV<span style={{ color: "#fbbf24" }}>i</span>
+        </h1>
+
+        <div style={{ ...styles.label, textAlign: "left", marginBottom: 8 }}>Spécialité</div>
+        <button onClick={() => setOuvert(!ouvert)} style={styles.dropBtn}>
+          <span style={{ color: "#64748b", fontWeight: 500 }}>Choisir une spécialité</span>
+          <span style={{ color: "#475569", transform: ouvert ? "rotate(180deg)" : "none", transition: "transform .15s" }}>▾</span>
+        </button>
+
+        {ouvert && (
+          <div style={styles.dropPanel}>
+            {SPECIALITES.map((sp, i) => (
+              <button
+                key={sp.id}
+                onClick={() => sp.actif && go("home")}
+                disabled={!sp.actif}
+                style={{
+                  ...styles.dropItem,
+                  borderTop: i === 0 ? "none" : "1px solid #1e293b",
+                  cursor: sp.actif ? "pointer" : "not-allowed",
+                  opacity: sp.actif ? 1 : 0.45,
+                }}
+              >
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: "block", fontWeight: 600, color: sp.actif ? "#f1f5f9" : "#64748b" }}>{sp.label}</span>
+                  <span style={{ display: "block", fontSize: 11, color: "#475569", marginTop: 2 }}>{sp.detail}</span>
+                </span>
+                {sp.actif
+                  ? <span style={{ color: "#fbbf24", fontSize: 15 }}>→</span>
+                  : <span style={styles.soon}>Bientôt</span>}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div style={{ marginTop: 48, fontSize: 10, color: "#1e293b", letterSpacing: 2, textTransform: "uppercase" }}>
+          v1.2 · Assistant technicien
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Home({ go, onBack }) {
   return (
     <div style={styles.homeWrap}>
       <div style={styles.grid} />
       <div style={styles.blob1} />
       <div style={styles.blob2} />
       <div style={{ position: "relative", maxWidth: 700, width: "100%", textAlign: "center" }}>
-        <div style={styles.badge}><div style={styles.dot} />Assistant Technicien</div>
+        <button
+          onClick={onBack}
+          style={{ ...styles.badge, cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <div style={styles.dot} />← Fermeture &amp; automatisme
+        </button>
         <h1 style={styles.logo}>SAV<span style={{ color: "#fbbf24" }}>i</span></h1>
         <p style={styles.sub}>L'assistant diagnostic intelligent pour techniciens de la fermeture industrielle & copro/syndic</p>
         <div style={styles.cards}>
@@ -284,7 +380,7 @@ function Doc({ onBack }) {
 }
 
 export default function App() {
-  const [s, setS] = useState("home");
+  const [s, setS] = useState("accueil");
   return (
     <div style={styles.page}>
       <Head>
@@ -295,7 +391,8 @@ export default function App() {
       {s === "ia" ? <IA onBack={() => setS("home")} />
         : s === "doc" ? <Doc onBack={() => setS("home")} />
         : s === "releve" ? <Releve onBack={() => setS("home")} />
-        : <Home go={setS} />}
+        : s === "home" ? <Home go={setS} onBack={() => setS("accueil")} />
+        : <Accueil go={setS} />}
     </div>
   );
 }
