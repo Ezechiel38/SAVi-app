@@ -24,8 +24,6 @@ const T = {
   tresFaible: "#475569",
   ambre: "#f59e0b",
   ambreClair: "#fbbf24",
-  emeraude: "#10b981",
-  emeraudeClair: "#34d399",
   cyan: "#22d3ee",
   rouge: "#f87171",
 };
@@ -183,14 +181,14 @@ export default function Dashboard({ onBack, releves = DEMO.releves, aujourdhui =
             valeur={d.delaiMedian ?? "—"}
             unite="j"
             sous="Médiane entre le relevé et le devis"
-            couleur={d.delaiMedian !== null && d.delaiMedian <= 3 ? T.emeraudeClair : T.ambreClair}
+            couleur={d.delaiMedian !== null && d.delaiMedian <= 3 ? T.cyan : T.ambreClair}
           />
           <Kpi
             label="Fiches complètes"
             valeur={d.tauxComplet}
             unite="%"
             sous={d.incomplets + " fiche" + (d.incomplets > 1 ? "s" : "") + " à compléter"}
-            couleur={d.tauxComplet >= 90 ? T.emeraudeClair : T.ambreClair}
+            couleur={d.tauxComplet >= 90 ? T.cyan : T.ambreClair}
           />
           <Kpi
             label="En attente de devis"
@@ -237,7 +235,7 @@ export default function Dashboard({ onBack, releves = DEMO.releves, aujourdhui =
               valeur={t.total}
               max={d.parTechnicien[0].total}
               detail={t.total + " relevés · " + Math.round((t.complets / t.total) * 100) + "% complets"}
-              couleur={t.complets === t.total ? T.emeraude : T.ambre}
+              couleur={t.complets === t.total ? T.cyan : T.ambre}
             />
           ))}
         </div>
