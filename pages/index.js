@@ -308,11 +308,16 @@ function IA({ onBack }) {
         body: JSON.stringify({ ctx, brand, model, symptoms }),
       });
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Le serveur a répondu " + res.status);
+      }
+      if (!data.causes || !data.causes.length) {
+        throw new Error("Réponse incomplète du serveur.");
+      }
       setResult(data);
     } catch (e) {
-      console.error(e);
-      setError("Erreur lors du diagnostic. Réessayez.");
+      console.error("Diagnostic :", e);
+      setError(e.message || "Erreur lors du diagnostic. Réessayez.");
     } finally { setLoading(false); }
   };
 
@@ -363,6 +368,16 @@ function IA({ onBack }) {
               <div style={{ background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", borderRadius: 18, padding: 18, marginBottom: 14 }}>
                 <div style={{ ...styles.label, color: "#fca5a5", marginBottom: 8 }}>⚠ Sécurité</div>
                 <p style={{ fontSize: 13, lineHeight: 1.5, color: "#fecaca", margin: 0 }}>{result.securite}</p>
+              </div>
+            )}
+            {result.precisions && result.precisions.length > 0 && (
+              <div style={{ background: "rgba(6,182,212,.08)", border: "1px solid rgba(6,182,212,.25)", borderRadius: 18, padding: 18, marginBottom: 14 }}>
+                <div style={{ ...styles.label, color: "#67e8f9", marginBottom: 8 }}>À préciser sur place</div>
+                {result.precisions.map((p, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, fontSize: 13, color: "#cbd5e1", marginBottom: 5 }}>
+                    <span style={{ color: "#22d3ee", fontWeight: 700 }}>?</span><span>{p}</span>
+                  </div>
+                ))}
               </div>
             )}
             <div style={{ ...styles.label, marginBottom: 12 }}>Causes probables</div>
