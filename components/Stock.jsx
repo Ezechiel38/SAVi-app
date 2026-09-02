@@ -103,6 +103,21 @@ async function effacer(magasin, id) {
   });
 }
 
+/* ------------------ compteur pour l'écran d'accueil ------------------ */
+
+export async function compteurStock() {
+  try {
+    const pieces = await tout(V_PIECES);
+    return {
+      references: pieces.length,
+      ruptures: pieces.filter((p) => p.quantite === 0).length,
+      basses: pieces.filter((p) => p.quantite > 0 && p.quantite <= p.seuil).length,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /* ----------------------------- utilitaires ----------------------------- */
 
 const idUnique = () => Date.now() + "-" + Math.random().toString(36).slice(2, 8);
