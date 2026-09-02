@@ -3,45 +3,107 @@ import Head from "next/head";
 import Releve from "../components/Releve";
 import Dashboard from "../components/Dashboard";
 import Documents from "../components/Documents";
+import Heures from "../components/Heures";
+import Stock from "../components/Stock";
+
+const FAMILLES = [
+  "Automatismes de portail",
+  "Portes sectionnelles & industrielles",
+  "Portes rapides",
+  "Portes automatiques piétonnes",
+  "Rideaux métalliques",
+  "Quais & manutention",
+  "Contrôle d'accès",
+];
 
 const BRANDS = [
-  { name: "Came", color: "#E30613", specialty: "Portails, portes de garage, bornes", website: "https://www.came.com/fr/fr",
+  // ---- Automatismes de portail ----
+  { name: "Came", color: "#E30613", famille: "Automatismes de portail", specialty: "Portails, portes de garage, bornes", website: "https://www.came.com/fr/fr",
     docs: [
       { title: "Came BX-74/78 — Manuel installateur", type: "Portail coulissant" },
       { title: "Came ATI — Notice technique", type: "Portail battant" },
       { title: "Came ZBX — Armoire de commande", type: "Électronique" },
       { title: "Came FROG — Motorisation enterrée", type: "Portail battant" },
     ]},
-  { name: "Nice", color: "#0066B3", specialty: "Automatismes portails & volets", website: "https://www.niceforyou.com/fr",
+  { name: "Nice", color: "#0066B3", famille: "Automatismes de portail", specialty: "Automatismes portails & volets", website: "https://www.niceforyou.com/fr",
     docs: [
       { title: "Nice Robus 600/1000 — Guide rapide", type: "Portail coulissant" },
       { title: "Nice Wingo — Notice technique", type: "Portail battant" },
       { title: "Nice MC824H — Logique de commande", type: "Électronique" },
     ]},
-  { name: "FAAC", color: "#003DA5", specialty: "Automatismes & contrôle d'accès", website: "https://www.faac.fr",
+  { name: "FAAC", color: "#003DA5", famille: "Automatismes de portail", specialty: "Automatismes & contrôle d'accès", website: "https://www.faac.fr",
     docs: [
       { title: "FAAC 740/741 — Manuel installation", type: "Portail coulissant" },
       { title: "FAAC 391 — Vérin portail battant", type: "Portail battant" },
       { title: "FAAC E124 — Armoire de commande", type: "Électronique" },
     ]},
-  { name: "BFT", color: "#F39200", specialty: "Automatismes résidentiels & industriels", website: "https://www.bft-automation.com/fr",
+  { name: "BFT", color: "#F39200", famille: "Automatismes de portail", specialty: "Automatismes résidentiels & industriels", website: "https://www.bft-automation.com/fr",
     docs: [
       { title: "BFT Deimos Ultra BT — Notice", type: "Portail coulissant" },
       { title: "BFT Phobos BT — Vérin", type: "Portail battant" },
       { title: "BFT Thalia — Centrale de commande", type: "Électronique" },
     ]},
-  { name: "Somfy", color: "#FFCC00", specialty: "Volets, stores, portails, domotique", website: "https://www.somfy.fr",
+  { name: "Somfy", color: "#FFCC00", famille: "Automatismes de portail", specialty: "Volets, stores, portails, domotique", website: "https://www.somfy.fr",
     docs: [
       { title: "Somfy Axovia Multipro — Portail battant", type: "Portail battant" },
       { title: "Somfy Elixo 500 3S — Portail coulissant", type: "Portail coulissant" },
       { title: "Somfy Dexxo Pro 1000 — Porte de garage", type: "Porte de garage" },
     ]},
-  { name: "Hörmann", color: "#003366", specialty: "Portes de garage, portes industrielles", website: "https://www.hormann.fr",
+  { name: "Beninca", color: "#64748b", famille: "Automatismes de portail", specialty: "Motorisations portails & barrières", website: "", docs: [] },
+  { name: "Ditec", color: "#64748b", famille: "Automatismes de portail", specialty: "Automatismes portails, barrières, piétonnes", website: "", docs: [] },
+  { name: "Roger Technology", color: "#64748b", famille: "Automatismes de portail", specialty: "Motorisations 24 V portails", website: "", docs: [] },
+  { name: "Erreka", color: "#64748b", famille: "Automatismes de portail", specialty: "Automatismes portails & industriels", website: "", docs: [] },
+  { name: "Proteco", color: "#64748b", famille: "Automatismes de portail", specialty: "Motorisations portails", website: "", docs: [] },
+
+  // ---- Portes sectionnelles & industrielles ----
+  { name: "Hörmann", color: "#003366", famille: "Portes sectionnelles & industrielles", specialty: "Portes de garage, portes industrielles", website: "https://www.hormann.fr",
     docs: [
       { title: "Hörmann SupraMatic E/P — Notice", type: "Porte de garage" },
       { title: "Hörmann WA 300 S4 — Porte industrielle", type: "Porte industrielle" },
       { title: "Hörmann LineaMatic P — Coulissant", type: "Portail coulissant" },
     ]},
+  { name: "Novoferm", color: "#64748b", famille: "Portes sectionnelles & industrielles", specialty: "Sectionnelles, coupe-feu, quais", website: "https://www.novoferm.fr", docs: [] },
+  { name: "Crawford", color: "#64748b", famille: "Portes sectionnelles & industrielles", specialty: "Portes industrielles (ASSA ABLOY)", website: "", docs: [] },
+  { name: "Ryterna", color: "#64748b", famille: "Portes sectionnelles & industrielles", specialty: "Sectionnelles industrielles et résidentielles", website: "", docs: [] },
+  { name: "Alpha Deuren", color: "#64748b", famille: "Portes sectionnelles & industrielles", specialty: "Sectionnelles industrielles sur mesure", website: "", docs: [] },
+  { name: "Sothoferm", color: "#64748b", famille: "Portes sectionnelles & industrielles", specialty: "Fermetures industrielles françaises", website: "", docs: [] },
+
+  // ---- Portes rapides ----
+  { name: "Maviflex", color: "#64748b", famille: "Portes rapides", specialty: "Portes souples rapides, fabricant lyonnais", website: "https://www.maviflex.com", docs: [] },
+  { name: "Nergeco", color: "#64748b", famille: "Portes rapides", specialty: "Portes rapides souples industrielles", website: "https://www.nergeco.com", docs: [] },
+  { name: "Efaflex", color: "#64748b", famille: "Portes rapides", specialty: "Portes rapides spiralées et à enroulement", website: "https://www.efaflex.com", docs: [] },
+  { name: "ASSA ABLOY Entrance", color: "#64748b", famille: "Portes rapides", specialty: "Portes rapides, quais, piétonnes (Albany, Besam)", website: "", docs: [] },
+  { name: "Dynaco", color: "#64748b", famille: "Portes rapides", specialty: "Portes rapides à enroulement", website: "", docs: [] },
+  { name: "Campisa", color: "#64748b", famille: "Portes rapides", specialty: "Portes rapides et équipements de quai", website: "", docs: [] },
+
+  // ---- Portes automatiques piétonnes ----
+  { name: "Record", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Portes automatiques coulissantes et battantes", website: "", docs: [] },
+  { name: "dormakaba", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Portes automatiques, ferme-portes, contrôle d'accès", website: "", docs: [] },
+  { name: "Portalp", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Portes automatiques, fabricant français", website: "", docs: [] },
+  { name: "Tormax", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Motorisations portes automatiques", website: "", docs: [] },
+  { name: "Besam", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Portes automatiques (ASSA ABLOY)", website: "", docs: [] },
+  { name: "Manusa", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Portes automatiques coulissantes", website: "", docs: [] },
+  { name: "Label", color: "#64748b", famille: "Portes automatiques piétonnes", specialty: "Automatismes de portes piétonnes", website: "", docs: [] },
+
+  // ---- Rideaux métalliques ----
+  { name: "Doitrand", color: "#64748b", famille: "Rideaux métalliques", specialty: "Rideaux métalliques, grilles, fabricant français", website: "", docs: [] },
+  { name: "Safir", color: "#64748b", famille: "Rideaux métalliques", specialty: "Rideaux métalliques et grilles articulées", website: "", docs: [] },
+  { name: "La Toulousaine", color: "#64748b", famille: "Rideaux métalliques", specialty: "Fermetures métalliques, portes de garage", website: "", docs: [] },
+  { name: "Rolflex", color: "#64748b", famille: "Rideaux métalliques", specialty: "Portes repliables et rideaux", website: "", docs: [] },
+
+  // ---- Quais & manutention ----
+  { name: "Rite-Hite", color: "#64748b", famille: "Quais & manutention", specialty: "Niveleurs, sas, équipements de quai", website: "", docs: [] },
+  { name: "Stertil", color: "#64748b", famille: "Quais & manutention", specialty: "Niveleurs de quai et systèmes de chargement", website: "", docs: [] },
+  { name: "Loading Systems", color: "#64748b", famille: "Quais & manutention", specialty: "Équipements de quai complets", website: "", docs: [] },
+  { name: "Hafa", color: "#64748b", famille: "Quais & manutention", specialty: "Niveleurs et sas d'étanchéité", website: "", docs: [] },
+
+  // ---- Contrôle d'accès ----
+  { name: "Urmet", color: "#64748b", famille: "Contrôle d'accès", specialty: "Interphonie, Vigik, contrôle d'accès", website: "", docs: [] },
+  { name: "Comelit", color: "#64748b", famille: "Contrôle d'accès", specialty: "Interphonie et vidéophonie", website: "", docs: [] },
+  { name: "Aiphone", color: "#64748b", famille: "Contrôle d'accès", specialty: "Portiers audio et vidéo", website: "", docs: [] },
+  { name: "Intratone", color: "#64748b", famille: "Contrôle d'accès", specialty: "Interphonie GSM sans fil, copropriété", website: "", docs: [] },
+  { name: "Noralsy", color: "#64748b", famille: "Contrôle d'accès", specialty: "Contrôle d'accès et Vigik", website: "", docs: [] },
+  { name: "Automatic Systems", color: "#64748b", famille: "Contrôle d'accès", specialty: "Barrières levantes, tourniquets, sas", website: "", docs: [] },
 ];
 
 const styles = {
@@ -223,7 +285,7 @@ function Accueil({ go }) {
         )}
 
         <div style={{ marginTop: 40, fontSize: 10, color: "#1e293b", letterSpacing: 2, textTransform: "uppercase" }}>
-          v1.3 · Assistant technicien
+          v1.6 · Assistant technicien
         </div>
       </div>
     </div>
@@ -280,6 +342,24 @@ function Home({ go, onBack }) {
               <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Tableau de bord</h2>
               <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Délais de chiffrage, fiches en attente, activité des équipes.</p>
               <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#fbbf24" }}>Voir l'activité →</div>
+            </div>
+          </button>
+          <button onClick={() => go("heures")} style={styles.card}>
+            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(6,182,212,.1)", filter: "blur(30px)" }} />
+            <div style={{ position: "relative" }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(6,182,212,.1)", border: "1px solid rgba(6,182,212,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>⏱</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Relevé d'heures</h2>
+              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Feuille hebdomadaire, heures majorables et récapitulatif à transmettre.</p>
+              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#22d3ee" }}>Saisir mes heures →</div>
+            </div>
+          </button>
+          <button onClick={() => go("stock")} style={styles.card}>
+            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(245,158,11,.1)", filter: "blur(30px)" }} />
+            <div style={{ position: "relative" }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📦</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Inventaire camion</h2>
+              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Stock de pièces, sorties tracées par client, réapprovisionnement.</p>
+              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#fbbf24" }}>Ouvrir mon stock →</div>
             </div>
           </button>
         </div>
@@ -343,7 +423,11 @@ function IA({ onBack }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
             <select value={brand} onChange={e => setBrand(e.target.value)} style={{ ...styles.input, appearance: "auto" }}>
               <option value="">— Marque —</option>
-              {BRANDS.map(b => <option key={b.name}>{b.name}</option>)}
+              {FAMILLES.map(f => (
+                <optgroup key={f} label={f}>
+                  {BRANDS.filter(b => b.famille === f).map(b => <option key={b.name}>{b.name}</option>)}
+                </optgroup>
+              ))}
               <option>Autre</option>
             </select>
             <input value={model} onChange={e => setModel(e.target.value)} placeholder="Modèle..." style={styles.input} />
@@ -413,8 +497,11 @@ function Doc({ onBack }) {
   const [sel, setSel] = useState(null);
   const [q, setQ] = useState("");
   const [onglet, setOnglet] = useState("constructeurs");
+  const [famille, setFamille] = useState(null);
   const brand = sel ? BRANDS.find(b => b.name === sel) : null;
-  const all = brand ? brand.docs.map(d => ({ ...d, brand: brand.name })) : BRANDS.flatMap(b => b.docs.map(d => ({ ...d, brand: b.name })));
+  const all = brand
+    ? brand.docs.map(d => ({ ...d, brand: brand.name }))
+    : BRANDS.filter(b => !famille || b.famille === famille).flatMap(b => b.docs.map(d => ({ ...d, brand: b.name })));
   const filtered = all.filter(d => d.title.toLowerCase().includes(q.toLowerCase()) || d.type.toLowerCase().includes(q.toLowerCase()));
   const bc = a => ({ padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: "pointer", border: a ? "1px solid #06b6d4" : "1px solid #334155", background: a ? "rgba(6,182,212,.1)" : "rgba(30,41,59,.3)", color: a ? "#67e8f9" : "#94a3b8" });
 
@@ -439,10 +526,22 @@ function Doc({ onBack }) {
           <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14 }}>🔍</span>
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher..." style={{ ...styles.input, paddingLeft: 40, padding: "13px 14px 13px 40px", borderRadius: 12, background: "rgba(15,23,42,.5)", border: "1px solid #1e293b" }} />
         </div>
-        <div style={{ ...styles.label, marginBottom: 10 }}>Marques</div>
+        <div style={{ ...styles.label, marginBottom: 10 }}>Type d'équipement</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 18 }}>
+          <button onClick={() => { setFamille(null); setSel(null); }} style={bc(!famille)}>Tous</button>
+          {FAMILLES.map(f => (
+            <button key={f} onClick={() => { setFamille(f); setSel(null); }} style={bc(famille === f)}>{f}</button>
+          ))}
+        </div>
+
+        <div style={{ ...styles.label, marginBottom: 10 }}>
+          Marques ({BRANDS.filter(b => !famille || b.famille === famille).length})
+        </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
           <button onClick={() => setSel(null)} style={bc(!sel)}>Toutes</button>
-          {BRANDS.map(b => <button key={b.name} onClick={() => setSel(b.name)} style={bc(sel === b.name)}>{b.name}</button>)}
+          {BRANDS.filter(b => !famille || b.famille === famille).map(b => (
+            <button key={b.name} onClick={() => setSel(b.name)} style={bc(sel === b.name)}>{b.name}</button>
+          ))}
         </div>
         {brand && (
           <div style={{ background: "rgba(15,23,42,.5)", border: "1px solid #1e293b", borderRadius: 16, padding: 18, marginBottom: 18, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
@@ -452,11 +551,18 @@ function Doc({ onBack }) {
               </div>
               <div style={{ fontSize: 13, color: "#94a3b8" }}>{brand.specialty}</div>
             </div>
-            <a href={brand.website} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(6,182,212,.3)", background: "rgba(6,182,212,.05)", color: "#67e8f9", fontSize: 13, fontWeight: 500, textDecoration: "none" }}>Site constructeur ↗</a>
+            {brand.website
+              ? <a href={brand.website} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(6,182,212,.3)", background: "rgba(6,182,212,.05)", color: "#67e8f9", fontSize: 13, fontWeight: 500, textDecoration: "none" }}>Site constructeur ↗</a>
+              : <span style={{ fontSize: 11.5, color: "#475569" }}>Lien constructeur à renseigner</span>}
           </div>
         )}
         <div style={{ ...styles.label, marginBottom: 10 }}>Documents ({filtered.length})</div>
-        {filtered.length === 0 && <div style={{ textAlign: "center", padding: 40, color: "#475569", fontSize: 14 }}>Aucun document trouvé</div>}
+        {filtered.length === 0 && (
+          <div style={{ textAlign: "center", padding: 34, border: "1px dashed #334155", borderRadius: 16, color: "#475569", fontSize: 13, lineHeight: 1.6 }}>
+            Aucun document pour cette sélection.<br />
+            Consulte le site constructeur, ou importe tes propres fiches dans l'onglet « Mes documents ».
+          </div>
+        )}
         {filtered.map((d, i) => (
           <div key={i} style={{ background: "rgba(15,23,42,.5)", border: "1px solid #1e293b", borderRadius: 12, padding: 14, display: "flex", alignItems: "center", gap: 14, marginBottom: 6, cursor: "pointer" }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>📄</div>
@@ -487,6 +593,8 @@ export default function App() {
         : s === "doc" ? <Doc onBack={() => setS("home")} />
         : s === "releve" ? <Releve onBack={() => setS("home")} />
         : s === "dashboard" ? <Dashboard onBack={() => setS("home")} />
+        : s === "heures" ? <Heures onBack={() => setS("home")} />
+        : s === "stock" ? <Stock onBack={() => setS("home")} />
         : s === "home" ? <Home go={setS} onBack={() => setS("accueil")} />
         : <Accueil go={setS} />}
     </div>
