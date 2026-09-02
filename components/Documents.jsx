@@ -40,7 +40,16 @@ const S = {
   panel: { background: T.panel, border: "1px solid " + T.border, borderRadius: 18, padding: 18, marginBottom: 16 },
 };
 
-const MARQUES = ["Came", "Nice", "FAAC", "BFT", "Somfy", "Hörmann", "Novoferm", "Générique", "Autre"];
+const MARQUES = [
+  "Came", "Nice", "FAAC", "BFT", "Somfy", "Ditec", "Beninca",
+  "Hörmann", "Novoferm", "Crawford", "Ryterna",
+  "Maviflex", "Nergeco", "Efaflex", "ASSA ABLOY Entrance", "Dynaco",
+  "Record", "dormakaba", "Portalp", "Tormax", "Besam",
+  "Doitrand", "Safir", "La Toulousaine",
+  "Rite-Hite", "Stertil",
+  "Urmet", "Comelit", "Aiphone", "Intratone",
+  "Générique", "Autre",
+];
 const TYPES = ["Notice constructeur", "Procédure interne", "Fiche de panne", "Schéma électrique", "Nomenclature pièces", "Fiche de sécurité", "Autre"];
 
 /* -------------------------- STOCKAGE (IndexedDB) -------------------------- */
