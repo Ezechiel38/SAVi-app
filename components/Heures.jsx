@@ -141,6 +141,27 @@ async function ecrireSemaine(enregistrement) {
   });
 }
 
+/* ------------------ compteur pour l'écran d'accueil ------------------ */
+
+export async function compteurHeures() {
+  try {
+    const l = lundiDe(new Date());
+    const r = await lireSemaine(cleSemaine(l));
+    if (!r || !r.jours) return { semaine: numeroSemaine(l), total: 0 };
+    let total = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(l);
+      d.setDate(d.getDate() + i);
+      total += dureeJour(r.jours[iso(d)]);
+    }
+    return { semaine: numeroSemaine(l), total };
+  } catch {
+    return null;
+  }
+}
+
+export { enHeures };
+
 /* ------------------------------ composant ------------------------------ */
 
 export default function Heures({ onBack }) {
