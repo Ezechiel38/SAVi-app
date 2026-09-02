@@ -124,8 +124,14 @@ const S = {
 };
 
 const MARQUES = [
-  "Came", "Nice", "FAAC", "BFT", "Somfy", "Hörmann",
-  "Novoferm", "Doitrand", "Safir", "Autre",
+  "Came", "Nice", "FAAC", "BFT", "Somfy", "Ditec", "Beninca", "Roger Technology",
+  "Hörmann", "Novoferm", "Crawford", "Ryterna", "Sothoferm",
+  "Maviflex", "Nergeco", "Efaflex", "ASSA ABLOY Entrance", "Dynaco", "Campisa",
+  "Record", "dormakaba", "Portalp", "Tormax", "Besam", "Label",
+  "Doitrand", "Safir", "La Toulousaine", "Rolflex",
+  "Rite-Hite", "Stertil", "Loading Systems",
+  "Urmet", "Comelit", "Aiphone", "Intratone", "Automatic Systems",
+  "Autre",
 ];
 
 const ETATS = ["Bon", "Usé", "HS", "Absent"];
