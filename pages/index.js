@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Releve from "../components/Releve";
 import Dashboard from "../components/Dashboard";
 import Documents from "../components/Documents";
-import Heures from "../components/Heures";
-import Stock from "../components/Stock";
+import Heures, { compteurHeures, enHeures } from "../components/Heures";
+import Stock, { compteurStock } from "../components/Stock";
 
 const FAMILLES = [
   "Automatismes de portail",
@@ -117,8 +117,11 @@ const styles = {
   dot: { width: 6, height: 6, borderRadius: "50%", background: "#fbbf24" },
   logo: { fontSize: "clamp(56px,14vw,96px)", fontWeight: 900, letterSpacing: -4, lineHeight: 1, marginBottom: 12 },
   sub: { color: "#94a3b8", fontSize: 15, maxWidth: 440, margin: "0 auto 48px", lineHeight: 1.6 },
-  cards: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 16, maxWidth: 700, width: "100%" },
-  card: { position: "relative", padding: 28, borderRadius: 18, border: "1px solid #1e293b", background: "rgba(15,23,42,.5)", textAlign: "left", cursor: "pointer", color: "#f1f5f9", overflow: "hidden" },
+  cards: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, maxWidth: 420, width: "100%", margin: "0 auto" },
+  card: { position: "relative", padding: "14px 13px 15px", borderRadius: 16, border: "1px solid #1e293b", background: "rgba(15,23,42,.5)", textAlign: "left", cursor: "pointer", color: "#f1f5f9", overflow: "hidden", fontFamily: "inherit" },
+  cardIc: { width: 38, height: 38, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 11 },
+  cardT: { fontSize: 13, fontWeight: 700, lineHeight: 1.25, margin: 0 },
+  cardS: { fontSize: 10, color: "#64748b", lineHeight: 1.4, marginTop: 3 },
   // HEADER
   header: { borderBottom: "1px solid #1e293b", background: "rgba(15,23,42,.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10 },
   headerInner: { maxWidth: 800, margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 },
@@ -293,77 +296,74 @@ function Accueil({ go }) {
 }
 
 function Home({ go, onBack }) {
+  const [stock, setStock] = useState(null);
+  const [heures, setHeures] = useState(null);
+
+  useEffect(() => {
+    let vivant = true;
+    compteurStock().then((r) => vivant && setStock(r)).catch(() => {});
+    compteurHeures().then((r) => vivant && setHeures(r)).catch(() => {});
+    return () => { vivant = false; };
+  }, []);
+
+  const sousTitreStock = !stock || stock.references === 0
+    ? "Pièces & traçabilité"
+    : stock.ruptures > 0
+    ? stock.ruptures + " en rupture"
+    : stock.basses > 0
+    ? stock.basses + " sous le seuil"
+    : stock.references + " références";
+
+  const sousTitreHeures = heures
+    ? "Semaine " + heures.semaine + " · " + enHeures(heures.total)
+    : "Feuille hebdomadaire";
+
+  const MODULES = [
+    { id: "ia", icone: "✨", titre: "Assistance IA", sous: "Diagnostic assisté", accent: "amber" },
+    { id: "doc", icone: "📘", titre: "Documentation", sous: BRANDS.length + " marques · mes fiches", accent: "cyan" },
+    { id: "releve", icone: "📋", titre: "Relevé pour devis", sous: "Prise de référence", accent: "amber" },
+    { id: "stock", icone: "📦", titre: "Inventaire camion", sous: sousTitreStock, accent: "cyan", alerte: stock && stock.ruptures > 0 },
+    { id: "heures", icone: "⏱", titre: "Relevé d'heures", sous: sousTitreHeures, accent: "amber" },
+    { id: "dashboard", icone: "📊", titre: "Tableau de bord", sous: "Activité & délais", accent: "cyan" },
+  ];
+
+  const teintes = {
+    amber: { fond: "rgba(245,158,11,.1)", bord: "rgba(245,158,11,.3)", texte: "#fbbf24" },
+    cyan: { fond: "rgba(6,182,212,.1)", bord: "rgba(6,182,212,.3)", texte: "#22d3ee" },
+  };
+
   return (
     <div style={styles.homeWrap}>
       <div style={styles.grid} />
       <div style={styles.blob1} />
       <div style={styles.blob2} />
-      <div style={{ position: "relative", maxWidth: 700, width: "100%", textAlign: "center" }}>
-        <button
-          onClick={onBack}
-          style={{ ...styles.badge, cursor: "pointer", fontFamily: "inherit" }}
-        >
+      <div style={{ position: "relative", maxWidth: 420, width: "100%", textAlign: "center" }}>
+        <button onClick={onBack} style={{ ...styles.badge, cursor: "pointer", fontFamily: "inherit" }}>
           <div style={styles.dot} />← Fermeture &amp; automatisme
         </button>
-        <h1 style={styles.logo}>SAV<span style={{ color: "#fbbf24" }}>i</span></h1>
-        <p style={styles.sub}>L'assistant diagnostic intelligent pour techniciens de la fermeture industrielle & copro/syndic</p>
+        <h1 style={{ ...styles.logo, fontSize: "clamp(38px,11vw,52px)", letterSpacing: -2, marginBottom: 22 }}>
+          SAV<span style={{ color: "#fbbf24" }}>i</span>
+        </h1>
+
         <div style={styles.cards}>
-          <button onClick={() => go("ia")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(245,158,11,.1)", filter: "blur(30px)" }} />
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>✨</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Assistance IA</h2>
-              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Décrivez les symptômes, l'IA propose causes probables et vérifications.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#fbbf24" }}>Lancer un diagnostic →</div>
-            </div>
-          </button>
-          <button onClick={() => go("doc")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(6,182,212,.1)", filter: "blur(30px)" }} />
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(6,182,212,.1)", border: "1px solid rgba(6,182,212,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📘</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Documentation technique</h2>
-              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Fiches et notices constructeurs par marque et modèle.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#22d3ee" }}>Parcourir la bibliothèque →</div>
-            </div>
-          </button>
-          <button onClick={() => go("releve")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(6,182,212,.1)", filter: "blur(30px)" }} />
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(6,182,212,.1)", border: "1px solid rgba(6,182,212,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📋</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Relevé pour devis</h2>
-              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Prise de référence sur site, transmise au commercial pour chiffrage.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#22d3ee" }}>Démarrer un relevé →</div>
-            </div>
-          </button>
-          <button onClick={() => go("dashboard")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(245,158,11,.1)", filter: "blur(30px)" }} />
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📊</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Tableau de bord</h2>
-              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Délais de chiffrage, fiches en attente, activité des équipes.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#fbbf24" }}>Voir l'activité →</div>
-            </div>
-          </button>
-          <button onClick={() => go("heures")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(6,182,212,.1)", filter: "blur(30px)" }} />
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(6,182,212,.1)", border: "1px solid rgba(6,182,212,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>⏱</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Relevé d'heures</h2>
-              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Feuille hebdomadaire, heures majorables et récapitulatif à transmettre.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#22d3ee" }}>Saisir mes heures →</div>
-            </div>
-          </button>
-          <button onClick={() => go("stock")} style={styles.card}>
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(245,158,11,.1)", filter: "blur(30px)" }} />
-            <div style={{ position: "relative" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>📦</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Inventaire camion</h2>
-              <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>Stock de pièces, sorties tracées par client, réapprovisionnement.</p>
-              <div style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "#fbbf24" }}>Ouvrir mon stock →</div>
-            </div>
-          </button>
+          {MODULES.map((m) => {
+            const t = teintes[m.accent];
+            return (
+              <button key={m.id} onClick={() => go(m.id)} style={styles.card}>
+                {m.alerte && (
+                  <span style={{ position: "absolute", top: 11, right: 11, width: 8, height: 8, borderRadius: "50%", background: "#f87171" }} />
+                )}
+                <div style={{ ...styles.cardIc, background: t.fond, border: "1px solid " + t.bord }}>{m.icone}</div>
+                <h2 style={styles.cardT}>{m.titre}</h2>
+                <div style={styles.cardS}>{m.sous}</div>
+              </button>
+            );
+          })}
         </div>
-        <div style={{ marginTop: 48, fontSize: 10, color: "#334155", letterSpacing: 2, textTransform: "uppercase" }}>v1.1 · Fermeture industrielle & copro</div>
+
+        <div style={{ marginTop: 26, fontSize: 9, color: "#334155", letterSpacing: 2, textTransform: "uppercase" }}>
+          v1.6 · Fermeture industrielle &amp; copro
+        </div>
       </div>
     </div>
   );
