@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /* ==================================================================== *
  *  RELEVÉ POUR DEVIS — module SAVi
@@ -1067,6 +1067,58 @@ function Champ({ champ, valeur, onChange }) {
   );
 }
 
+/* ---------------------------- STOCKAGE ----------------------------
+ *  La fiche en cours est enregistrée dans IndexedDB à chaque
+ *  modification, avec un léger différé pour ne pas écrire à chaque
+ *  frappe. Un technicien qui ferme l'onglet en plein relevé retrouve
+ *  sa saisie, photos comprises.
+ * ------------------------------------------------------------------ */
+
+const DB_NOM = "savi-releve";
+const MAGASIN = "fiches";
+const CLE_COURANTE = "courant";
+
+function ouvrirBase() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NOM, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(MAGASIN)) db.createObjectStore(MAGASIN, { keyPath: "id" });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function lireFiche() {
+  const db = await ouvrirBase();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(MAGASIN, "readonly").objectStore(MAGASIN).get(CLE_COURANTE);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function ecrireFiche(fiche) {
+  const db = await ouvrirBase();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(MAGASIN, "readwrite");
+    tx.objectStore(MAGASIN).put({ ...fiche, id: CLE_COURANTE });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function effacerFiche() {
+  const db = await ouvrirBase();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(MAGASIN, "readwrite");
+    tx.objectStore(MAGASIN).delete(CLE_COURANTE);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 /* ----------------------------- module ----------------------------- */
 
 export default function Releve({ onBack }) {
@@ -1077,6 +1129,48 @@ export default function Releve({ onBack }) {
   const [releve, setReleve] = useState({});
   const [photosLibres, setPhotosLibres] = useState([]);
   const [pdfOpts, setPdfOpts] = useState({ seulementDevis: false, masquerVides: true, avecPhotos: true });
+  const [pret, setPret] = useState(false);
+  const [enregistre, setEnregistre] = useState(null);
+
+  // relecture de la fiche en cours au démarrage
+  useEffect(() => {
+    let vivant = true;
+    lireFiche()
+      .then((f) => {
+        if (!vivant || !f) return;
+        setContexte(f.contexte || {});
+        setReleve(f.releve || {});
+        setPhotosLibres(f.photosLibres || []);
+        setEnregistre(f.maj || null);
+      })
+      .catch(() => {})
+      .finally(() => vivant && setPret(true));
+    return () => { vivant = false; };
+  }, []);
+
+  // sauvegarde différée à chaque modification
+  useEffect(() => {
+    if (!pret) return;
+    const minuterie = setTimeout(() => {
+      const maj = new Date().toISOString();
+      ecrireFiche({ contexte, releve, photosLibres, maj })
+        .then(() => setEnregistre(maj))
+        .catch(() => {});
+    }, 600);
+    return () => clearTimeout(minuterie);
+  }, [pret, contexte, releve, photosLibres]);
+
+  const nouvelleFiche = () => {
+    if (!window.confirm("Effacer la fiche en cours et repartir de zéro ? Cette action est définitive.")) return;
+    effacerFiche().catch(() => {});
+    setContexte({});
+    setReleve({});
+    setPhotosLibres([]);
+    setEnregistre(null);
+    setEquipement(null);
+    setComposant(null);
+    setVue("equipements");
+  };
 
   const lignes = Object.entries(releve).map(([k, v]) => {
     const [eqId, compId] = k.split("::");
@@ -1154,6 +1248,14 @@ export default function Releve({ onBack }) {
             </span>
             <span style={{ color: T.tresFaible }}>→</span>
           </button>
+
+          {enregistre && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 11.5, color: T.faible }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: T.accent, flexShrink: 0 }} />
+              Fiche enregistrée sur cet appareil ·{" "}
+              {new Date(enregistre).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+            </div>
+          )}
 
           <div style={{ ...S.label, marginBottom: 12 }}>Type d'équipement</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 12 }}>
@@ -1626,6 +1728,19 @@ export default function Releve({ onBack }) {
         {lignes.length > 0 && (
           <button onClick={() => setVue("pdf")} style={S.btnPrimary}>📄 Générer le PDF</button>
         )}
+
+        {(lignes.length > 0 || Object.keys(contexte).length > 0) && (
+          <button
+            onClick={nouvelleFiche}
+            style={{ width: "100%", marginTop: 12, padding: 13, borderRadius: 10, border: "1px solid " + T.borderFort, background: "rgba(30,41,59,.3)", color: T.doux, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
+          >
+            Nouvelle fiche
+          </button>
+        )}
+
+        <div style={{ fontSize: 11, color: T.tresFaible, textAlign: "center", marginTop: 14, lineHeight: 1.5 }}>
+          La fiche en cours est enregistrée sur cet appareil. Génère le PDF avant de repartir de zéro.
+        </div>
       </div>
     </div>
   );
